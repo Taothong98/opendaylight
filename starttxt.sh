@@ -36,9 +36,9 @@ http://localhost:8181/rests/data/ietf-yang-library:modules-state
 
 sudo docker logs odl_controller
 
-ip odl = 10.222.20.222 and 172.16.1.102
+# ip odl = 10.222.20.222 and 172.16.1.102
 # ตั้งค่า IP Address ให้กับ Switch ใน GNS3
-ifconfig eth0 10.222.20.102 netmask 255.255.255.0 up
+ifconfig eth0 10.222.20.103 netmask 255.255.255.0 up
 ping 10.222.20.222
 
 ovs-vsctl show
@@ -57,3 +57,18 @@ ovs-vsctl show
 # ดูตรงบรรทัด Controller "tcp:..." จะต้องมีคำว่า is_connected: true ครับ
 # เช็คที่ฝั่ง OpenDaylight (Browser/Postman): เข้าลิงก์เดิมครับ: http://172.16.1.102:8181/rests/data/network-topology:network-topology
 # คุณควรจะเห็น Node ใหม่โผล่ขึ้นมา (เช่น openflow:1234...) ครับ
+
+# ดูว่า OpenDaylight "เสก" กฎอะไรลงไปใน Switch บ้าง
+ovs-ofctl -O OpenFlow13 dump-flows br0
+
+# dump-flows แล้วยังเห็นแค่บรรทัดเดียว (priority=0 actions=CONTROLLER) แสดงว่า:
+# ODL ทำงานแบบ "Hub Mode" หรือ Packet-Out Only: คือรับเรื่องเองทุกเม็ด ไม่ฝังกฎลง Switch (กินแรง CPU Controller เยอะ)
+
+
+# ลองเพิ่มกฎง่ายๆ ดูครับ (Block Ping จากภายนอก)
+# Method: PUT
+# เปลี่ยน openflow:174191499024971 เป็น ID ของ Switch ตัวที่ PC ต่ออยู่
+# block-ping-1 คือชื่อ ID ของกฎที่เราตั้งเอง
+http://172.16.1.102:8181:8181/rests/data/opendaylight-inventory:nodes/node/openflow:174191499024971/flow-node-inventory:table/0/flow/block-ping-1
+# Auth: User: admin / Pass: admin
+# Header: Content-Type: application/json
