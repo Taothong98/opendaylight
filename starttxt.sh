@@ -32,3 +32,28 @@ Username: admin
 Password: admin
 
 http://localhost:8181/rests/data/ietf-yang-library:modules-state
+
+
+sudo docker logs odl_controller
+
+ip odl = 10.222.20.222 and 172.16.1.102
+# ตั้งค่า IP Address ให้กับ Switch ใน GNS3
+ifconfig eth0 10.222.20.102 netmask 255.255.255.0 up
+ping 10.222.20.222
+
+ovs-vsctl show
+# สั่งให้ OVS วิ่งไปหา OpenDaylight
+ovs-vsctl add-br br0
+# เพิ่มพอร์ต eth0 เข้าไปใน Bridge
+ovs-vsctl add-port br0 eth0
+
+
+# ตั้งค่า Controller: เปลี่ยน 10.222.20.222 เป็น IP เครื่อง ODl
+ovs-vsctl set-controller br0 tcp:10.222.20.222:6633
+# ตั้งค่า OpenFlow Version (แนะนำ): OpenDaylight ทำงานได้ดีที่สุดกับ OpenFlow 1.3
+# ovs-vsctl set protocols br0 OpenFlow13
+ovs-vsctl show
+
+# ดูตรงบรรทัด Controller "tcp:..." จะต้องมีคำว่า is_connected: true ครับ
+# เช็คที่ฝั่ง OpenDaylight (Browser/Postman): เข้าลิงก์เดิมครับ: http://172.16.1.102:8181/rests/data/network-topology:network-topology
+# คุณควรจะเห็น Node ใหม่โผล่ขึ้นมา (เช่น openflow:1234...) ครับ
