@@ -14,9 +14,9 @@ services:
 # เพิ่ม 2 บรรทัดนี้เพื่อแก้ปัญหา locale
       - LANG=C.UTF-8
       - LC_ALL=C.UTF-8      
-    volumes:
-      - ./entrypoint.sh:/entrypoint.sh    
-      - ./users.properties:/etc/users.properties    
+    # volumes:
+    #   - ./entrypoint.sh:/entrypoint.sh    
+    #   - ./users.properties:/etc/users.properties    
 
       
     restart: unless-stopped
