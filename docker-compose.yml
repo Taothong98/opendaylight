@@ -1,0 +1,24 @@
+services:
+  opendaylight:
+    # image: opendaylight/odl:latest
+    image: opendaylight/odl-ubuntu-image
+    # ถ้า latest ไม่เวิร์ค ให้ลองเปลี่ยนเป็น opendaylight/odl:13.0.0
+    container_name: odl_controller
+    ports:
+      - "8181:8181"
+      - "6633:6633"
+      - "6653:6653"
+      - "8101:8101"
+    environment:
+      - JAVA_OPTS=-Xms2g -Xmx4g
+# เพิ่ม 2 บรรทัดนี้เพื่อแก้ปัญหา locale
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8      
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh    
+      - ./users.properties:/etc/users.properties    
+
+      
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
