@@ -17,8 +17,6 @@ services:
     # volumes:
     #   - ./entrypoint.sh:/entrypoint.sh    
     #   - ./users.properties:/etc/users.properties    
-
-      
     restart: unless-stopped
     stdin_open: true
     tty: true
