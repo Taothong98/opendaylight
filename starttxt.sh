@@ -21,10 +21,12 @@ feature:list -i | grep odl-openflowplugin-app-table-miss-enforcer
 # feature:list -i | grep openflow
 
 
+# ดูรหัสผ่านในไฟล์ users.properties
 cat etc/users.properties
 Username: karaf
 Password: karaf
 
+# เพิ่ม user ใหม่ ชื่อ admin รหัสผ่าน admin
 echo "admin = admin,_g_:admingroup" >> etc/users.properties
 Username: admin
 Password: admin
