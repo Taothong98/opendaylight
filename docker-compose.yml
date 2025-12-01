@@ -11,12 +11,19 @@ services:
       - "8101:8101"
     environment:
       - JAVA_OPTS=-Xms2g -Xmx4g
-# เพิ่ม 2 บรรทัดนี้เพื่อแก้ปัญหา locale
+    # เพิ่ม 2 บรรทัดนี้เพื่อแก้ปัญหา locale
       - LANG=C.UTF-8
       - LC_ALL=C.UTF-8      
-    # volumes:
+    volumes:
+      - ./hawtio-karaf-2.17.0-features.xml:/home/user/karaf-0.18.1/hawtio-karaf-2.17.0-features.xml    
+      - ./hawtio-osgi-2.17.0.war:/home/user/karaf-0.18.1/deploy/hawtio-osgi-2.17.0.war
     #   - ./entrypoint.sh:/entrypoint.sh    
     #   - ./users.properties:/etc/users.properties    
     restart: unless-stopped
     stdin_open: true
     tty: true
+
+
+
+    # ONOS Controller
+    # docker run -d -p 8181:8181 -p 8101:8101 -p 6653:6653 -p 6633:6633 --name onos onosproject/onos

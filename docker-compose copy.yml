@@ -1,0 +1,14 @@
+version: '2'
+services:
+  opendaylight:
+    image: opendaylight/odl:nitrogen-sr4
+    container_name: odl_nitrogen
+    ports:
+      - "8181:8181" # REST API & GUI
+      - "6633:6633" # OpenFlow
+      - "6653:6653" # OpenFlow
+      - "8101:8101" # Console
+    environment:
+      - JAVA_OPTS=-Xms2g -Xmx4g
+    stdin_open: true
+    tty: true
