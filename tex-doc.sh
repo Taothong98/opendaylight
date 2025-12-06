@@ -103,3 +103,18 @@ http://172.16.1.102:8181:8181/rests/data/opendaylight-inventory:nodes/node/openf
 # docker tag odl-ubuntu-f:1.0 taothong/odl-ubuntu-f:1.0
 # docker push taothong/odl-ubuntu-f:1.0
 
+
+# ------------------------------------------------------------------------------
+# ovs-vsctl show
+# ovs-vsctl add-br br1
+# ovs-vsctl add-br br0 -- set bridge br0 datapath_type=netdev
+# ovs-vsctl del-br br0
+# ovs-vsctl del-br br1
+
+# ovs-vsctl show
+# ip addr show br1
+
+# ---------- ดู ip interface ----------
+# ip -br a
+# ip addr
+# ovs-ofctl show br1

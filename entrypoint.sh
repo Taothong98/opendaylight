@@ -1,15 +1,19 @@
 #!/bin/bash
-# Start SSH server as the root user
-/usr/sbin/sshd -D &
-# Wait for SSH server to start (you can customize the sleep duration as needed)
-sleep 5
 
-if [ -n "$FEATURES" ]; then
-    # Update the featuresBoot line in org.apache.karaf.features.cfg
-    su - user -c "sed -i \"s/\(featuresBoot= \|featuresBoot = \)/featuresBoot = $FEATURES,/g\" /home/user/karaf-${KARAF_VERSION}/etc/org.apache.karaf.features.cfg"
+echo "=== [Step 1] Starting Open vSwitch ==="
+
+# สั่ง start แบบไม่สน error (เพราะ WSL2 จะ error เรื่อง kernel module เสมอ)
+/usr/share/openvswitch/scripts/ovs-ctl start --system-id=random || true
+
+# ตรวจสอบว่า process หลัก (ovs-vswitchd) ขึ้นหรือไม่ ถ้าไม่ขึ้นให้บังคับรัน
+if ! pgrep -x "ovs-vswitchd" > /dev/null; then
+    echo "Warning: ovs-vswitchd not running. Force starting it..."
+    ovs-vswitchd --pidfile --detach --log-file
 fi
-chmod +w /home/user/karaf-${KARAF_VERSION}/etc/
-# Run Karaf as the non-root user
-su - user -c "/home/user/karaf-${KARAF_VERSION}/bin/karaf run"
-# Keep the container running
-tail -f /dev/null
+
+# โชว์สถานะเพื่อความชัวร์
+/usr/share/openvswitch/scripts/ovs-ctl status
+
+echo "=== [Step 2] Starting OpenDaylight ==="
+# ส่งต่อไปยังคำสั่งใน CMD
+exec "$@"
