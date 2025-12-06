@@ -34,8 +34,9 @@ feature:list -i | grep odl-openflowplugin-app-table-miss-enforcer
 
 bundle:list -s | grep hawtio
 feature:install hawtio
+
 feature:install war
-bundle:start 49
+bundle:start 50
 bundle:list -s | grep hawtio
 
 # เข้าไปที่ URL นี้: http://localhost:8181/hawtio
@@ -44,13 +45,13 @@ bundle:list -s | grep hawtio
 
 # ดูรหัสผ่านในไฟล์ users.properties
 cat etc/users.properties
-Username: karaf
-Password: karaf
+# Username: karaf
+# Password: karaf
 
 # เพิ่ม user ใหม่ ชื่อ admin รหัสผ่าน admin
 echo "admin = admin,_g_:admingroup" >> etc/users.properties
-Username: admin
-Password: admin
+# Username: admin
+# Password: admin
 
 http://localhost:8181/rests/data/ietf-yang-library:modules-state
 # ------------------------------------------------------------------------------
@@ -93,3 +94,12 @@ ovs-ofctl -O OpenFlow13 dump-flows br0
 http://172.16.1.102:8181:8181/rests/data/opendaylight-inventory:nodes/node/openflow:174191499024971/flow-node-inventory:table/0/flow/block-ping-1
 # Auth: User: admin / Pass: admin
 # Header: Content-Type: application/json
+
+
+# docker image build -t odl-ubuntu-f:latest .
+# docker images
+
+# docker commit odl_controller odl-ubuntu-f:1.0
+# docker tag odl-ubuntu-f:1.0 taothong/odl-ubuntu-f:1.0
+# docker push taothong/odl-ubuntu-f:1.0
+
