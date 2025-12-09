@@ -31,6 +31,8 @@ echo "c.ServerApp.port = 8888" >> $CONFIG_FILE
 echo "c.ServerApp.open_browser = False" >> $CONFIG_FILE
 echo "c.ServerApp.allow_root = True" >> $CONFIG_FILE
 echo "c.ServerApp.token = 'master'" >> $CONFIG_FILE
+
+
 echo "c.ServerApp.root_dir = '/'" >> $CONFIG_FILE # ให้มองเห็นทั้งเครื่อง
 
 echo "=== [Install] Jupyter Complete ==="

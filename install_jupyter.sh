@@ -38,15 +38,15 @@ echo "c.ServerApp.allow_root = True" >> $CONFIG_FILE
 echo "c.ServerApp.token = 'master'" >> $CONFIG_FILE
 echo "c.ServerApp.root_dir = '/'" >> $CONFIG_FILE
 
-# ไม่ต้องใส่ base_url แล้ว (เพราะ Nginx Regex จัดการให้)
-# echo "c.ServerApp.base_url = '/proxy/jupyter'" >> $CONFIG_FILE 
 
-# --- 🔥 เพิ่ม 3 บรรทัดนี้ เพื่อปลดล็อก iFrame และ Origin ---
-# 1. อนุญาตให้เข้าถึงจาก Origin ไหนก็ได้ (แก้ปัญหา 403 Forbidden)
+# --- 🔥 จุดเปลี่ยนสำคัญ: บอก Jupyter ว่าตัวเองอยู่ที่ /jupyter 🔥 ---
+echo "c.ServerApp.base_url = '/jupyter'" >> $CONFIG_FILE
+
+# ปิดระบบความปลอดภัยเรื่อง Origin และ iFrame
 echo "c.ServerApp.allow_origin = '*'" >> $CONFIG_FILE
 echo "c.ServerApp.allow_remote_access = True" >> $CONFIG_FILE
-
-# 2. ปิดระบบเช็ค iFrame ของ Jupyter เอง (Tornado settings)
 echo "c.ServerApp.tornado_settings = {'headers': {'Content-Security-Policy': \"frame-ancestors 'self' *\"}}" >> $CONFIG_FILE
+# ปิด XSRF check เพื่อให้ iframe ทำงานได้ลื่นขึ้น
+echo "c.ServerApp.disable_check_xsrf = True" >> $CONFIG_FILE
 
 echo "=== [Install] Jupyter Complete ==="

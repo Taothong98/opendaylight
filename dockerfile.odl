@@ -19,6 +19,9 @@ COPY install_jupyter.sh /usr/local/bin/install_jupyter.sh
 RUN chmod +x /usr/local/bin/install_jupyter.sh && \
     /usr/local/bin/install_jupyter.sh
 
+# 3. odl    setup script
+COPY setup_odl.sh /usr/local/bin/setup_odl.sh
+RUN chmod +x /usr/local/bin/setup_odl.sh
 # --- ส่วน Runtime ---
 # Copy Entrypoint
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
