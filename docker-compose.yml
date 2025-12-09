@@ -38,3 +38,16 @@ services:
 
     # ONOS Controller
     # docker run -d -p 8181:8181 -p 8101:8101 -p 6653:6653 -p 6633:6633 --name onos onosproject/onos
+
+  gateway:
+    build: 
+      context: .
+      dockerfile: dockerfile.gateway  # <-- ชี้ไปที่ไฟล์ใหม่ที่เราสร้าง
+    container_name: odl-gateway
+    ports:
+      - "8077:80"  # เข้าผ่าน port 80 (http://localhost)
+    volumes:
+      # เชื่อมโฟลเดอร์ web ในเครื่องเรา -> ไปที่ /var/www/dashboard ใน Container
+      - ./web:/var/www/dashboard      
+    # depends_on:
+    #   - odl-service

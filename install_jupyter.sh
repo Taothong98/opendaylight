@@ -24,6 +24,8 @@ fi
 mkdir -p /root/.jupyter
 CONFIG_FILE="/root/.jupyter/jupyter_lab_config.py"
 
+echo "c.ServerApp.base_url = '/proxy/jupyter'" >> $CONFIG_FILE # <-- เพิ่มบรรทัดนี้
+
 echo "c.ServerApp.ip = '0.0.0.0'" > $CONFIG_FILE
 echo "c.ServerApp.port = 8888" >> $CONFIG_FILE
 echo "c.ServerApp.open_browser = False" >> $CONFIG_FILE
