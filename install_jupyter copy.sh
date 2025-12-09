@@ -22,31 +22,15 @@ fi
 
 # 4. สร้าง Config Jupyter (ให้รองรับ root และเข้าผ่าน web ได้)
 mkdir -p /root/.jupyter
-# ... (ส่วนบนเหมือนเดิม)
-
 CONFIG_FILE="/root/.jupyter/jupyter_lab_config.py"
 
-echo "=== [Config] Generating Jupyter Config ==="
+echo "c.ServerApp.base_url = '/proxy/jupyter'" >> $CONFIG_FILE # <-- เพิ่มบรรทัดนี้
 
-# บรรทัดแรกใช้ > เพื่อสร้างไฟล์ใหม่
 echo "c.ServerApp.ip = '0.0.0.0'" > $CONFIG_FILE
-
-# บรรทัดต่อไปใช้ >> เพื่อต่อท้าย
 echo "c.ServerApp.port = 8888" >> $CONFIG_FILE
 echo "c.ServerApp.open_browser = False" >> $CONFIG_FILE
 echo "c.ServerApp.allow_root = True" >> $CONFIG_FILE
 echo "c.ServerApp.token = 'master'" >> $CONFIG_FILE
-echo "c.ServerApp.root_dir = '/'" >> $CONFIG_FILE
-
-# ไม่ต้องใส่ base_url แล้ว (เพราะ Nginx Regex จัดการให้)
-# echo "c.ServerApp.base_url = '/proxy/jupyter'" >> $CONFIG_FILE 
-
-# --- 🔥 เพิ่ม 3 บรรทัดนี้ เพื่อปลดล็อก iFrame และ Origin ---
-# 1. อนุญาตให้เข้าถึงจาก Origin ไหนก็ได้ (แก้ปัญหา 403 Forbidden)
-echo "c.ServerApp.allow_origin = '*'" >> $CONFIG_FILE
-echo "c.ServerApp.allow_remote_access = True" >> $CONFIG_FILE
-
-# 2. ปิดระบบเช็ค iFrame ของ Jupyter เอง (Tornado settings)
-echo "c.ServerApp.tornado_settings = {'headers': {'Content-Security-Policy': \"frame-ancestors 'self' *\"}}" >> $CONFIG_FILE
+echo "c.ServerApp.root_dir = '/'" >> $CONFIG_FILE # ให้มองเห็นทั้งเครื่อง
 
 echo "=== [Install] Jupyter Complete ==="

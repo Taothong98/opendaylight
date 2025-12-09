@@ -2,10 +2,10 @@ services:
   opendaylight:
     build:
       context: ./
-      dockerfile: dockerfile  
+      dockerfile: dockerfile.odl
     # image: opendaylight/odl:latest
     # image: opendaylight/odl-ubuntu-image
-    # ถ้า latest ไม่เวิร์ค ให้ลองเปลี่ยนเป็น opendaylight/odl:13.0.0
+    # image: taothong/odl-ubuntu-f:1.0
     container_name: odl_controller
     ports:
       - "8181:8181"
@@ -13,14 +13,19 @@ services:
       - "6653:6653"
       - "8101:8101"
       - "8888:8888"      
+
+      - "8090:8080"      
     environment:
       - JAVA_OPTS=-Xms2g -Xmx4g
     # เพิ่ม 2 บรรทัดนี้เพื่อแก้ปัญหา locale
       - LANG=C.UTF-8
       - LC_ALL=C.UTF-8      
     volumes:
-      - ./hawtio-karaf-2.17.0-features.xml:/home/user/karaf-0.18.1/hawtio-karaf-2.17.0-features.xml    
-      - ./hawtio-osgi-2.17.0.war:/home/user/karaf-0.18.1/deploy/hawtio-osgi-2.17.0.war
+      - ./hawtio/hawtio-karaf-2.17.0-features.xml:/home/user/karaf-0.18.1/hawtio-karaf-2.17.0-features.xml    
+      - ./hawtio/hawtio-osgi-2.17.0.war:/home/user/karaf-0.18.1/deploy/hawtio-osgi-2.17.0.war
+
+      - ./web_porxy_nginx:/var/www/dashboard    
+      - ./web_porxy_nginx/menu_config.js:/var/www/dashboard/menu_config.js
     #   - ./entrypoint.sh:/entrypoint.sh    
     #   - ./users.properties:/etc/users.properties
     privileged: true  # <--- บรรทัดนี้สำคัญที่สุด! สำคัญกว่า cap_add
@@ -33,7 +38,9 @@ services:
     restart: unless-stopped
     stdin_open: true
     tty: true
-
+    networks:      
+      wan:
+        ipv4_address: 192.168.100.200  
 
 
     # ONOS Controller
@@ -44,10 +51,21 @@ services:
       context: .
       dockerfile: dockerfile.gateway  # <-- ชี้ไปที่ไฟล์ใหม่ที่เราสร้าง
     container_name: odl-gateway
-    ports:
-      - "8077:80"  # เข้าผ่าน port 80 (http://localhost)
+
     volumes:
-      # เชื่อมโฟลเดอร์ web ในเครื่องเรา -> ไปที่ /var/www/dashboard ใน Container
-      - ./web:/var/www/dashboard      
+      - ./web_porxy_nginx:/var/www/dashboard    
+    ports:
+      - "8080:8080"      
+    # network_mode: "host"        
     # depends_on:
     #   - odl-service
+    networks:      
+      wan:
+        ipv4_address: 192.168.100.100    
+
+networks:
+  wan:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24

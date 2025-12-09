@@ -36,7 +36,7 @@ bundle:list -s | grep hawtio
 feature:install hawtio
 
 feature:install war
-bundle:start 61
+bundle:start 25
 bundle:list -s | grep hawtio
 
 # เข้าไปที่ URL นี้: http://localhost:8181/hawtio
