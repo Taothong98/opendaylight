@@ -26,6 +26,19 @@ services:
 
       - ./web_porxy_nginx:/var/www/dashboard    
       - ./web_porxy_nginx/menu_config.js:/var/www/dashboard/menu_config.js
+
+      - ./setup_odl.sh:/usr/local/bin/setup_odl.sh
+      - ./unlock_hawtio.sh:/usr/local/bin/unlock_hawtio.sh
+
+      # http://localhost:8181/hawtio
+
+      # - /usr/local/bin/setup_odl.sh
+      # - /usr/local/bin/unlock_hawtio.sh
+
+
+
+
+
     #   - ./entrypoint.sh:/entrypoint.sh    
     #   - ./users.properties:/etc/users.properties
     privileged: true  # <--- บรรทัดนี้สำคัญที่สุด! สำคัญกว่า cap_add

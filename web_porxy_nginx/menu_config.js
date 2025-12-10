@@ -7,15 +7,17 @@ const appConfig = {
             active: true
         },
         {
-            // Hawtio อยู่ Port 8181
             name: "Hawtio (ODL)",
             url: "/hawtio/",
             // url: "/proxy/8181/hawtio/",
-
             active: false
         },
         {
-            // Jupyter อยู่ Port 8888
+            name: "API (ODL)",
+            url: "http://localhost:8181/rests/data/ietf-yang-library:modules-state",
+            active: false
+        },
+        {
             name: "Jupyter Lab",
             // url: "/proxy/8888/lab",
             // url: "http://localhost:8888",

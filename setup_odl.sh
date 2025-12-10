@@ -1,58 +1,59 @@
 #!/bin/bash
 
-# ตั้งค่า Path ให้ถูกต้อง
+# ตั้งค่า Path
 KARAF_DIR="/home/user/karaf-0.18.1"
-SYS_PROP="$KARAF_DIR/etc/system.properties"
 CLIENT_BIN="$KARAF_DIR/bin/client"
+LOG_FILE="/var/log/odl_setup.log"
 
-echo "--- [Setup] Configuring OpenDaylight & Hawtio ---"
+# รายชื่อ Feature
+FEATURES="odl-restconf odl-openflowplugin-flow-services-rest odl-openflowplugin-app-table-miss-enforcer"
 
-# ==========================================
-# ส่วนที่ 1: ปลดล็อก Security (ทำก่อน ODL Start)
-# ==========================================
-if [ -f "$SYS_PROP" ]; then
-    echo " >> Unlocking Hawtio Security in system.properties..."
-    
-    # เช็คก่อนว่าเคยเติมไปรึยัง กันการเขียนซ้ำ
-    if ! grep -q "hawtio.xframeOptionsEnabled" "$SYS_PROP"; then
-        echo "" >> "$SYS_PROP"
-        echo "# --- Custom Config by setup_odl.sh ---" >> "$SYS_PROP"
-        # ปิด X-Frame เพื่อให้ใส่ใน iFrame (Nginx) ได้
-        echo "hawtio.xframeOptionsEnabled = false" >> "$SYS_PROP"
-        # ปิด CSP เพื่อให้โหลด Script ข้าม Domain ได้
-        echo "hawtio.contentSecurityPolicyEnabled = false" >> "$SYS_PROP"
-        # ปิด Strict Transport (ถ้าไม่ได้ใช้ HTTPS)
-        echo "hawtio.http.strictTransportSecurity = false" >> "$SYS_PROP"
-        # อนุญาต Error Detail
-        echo "jolokia.allowErrorDetails = true" >> "$SYS_PROP"
-        # ถ้าจำเป็นต้องปิด Auth (ไม่แนะนำถ้าขึ้น Production)
-        # echo "hawtio.authenticationEnabled = false" >> "$SYS_PROP"
-    else
-        echo " >> Configuration already exists. Skipping."
-    fi
-else
-    echo " !! ERROR: system.properties not found at $SYS_PROP"
-fi
-
-# ==========================================
-# ส่วนที่ 2: ฟังก์ชันติดตั้ง Feature (ทำทีหลัง)
-# ==========================================
-install_features_task() {
-    # รอจนกว่า Karaf จะตื่นและเปิด Port 8101 (SSH)
-    echo " >> Waiting for Karaf to start..."
-    until $CLIENT_BIN "system:version" > /dev/null 2>&1; do
-        sleep 5
-        echo "    ... waiting for Karaf SSH ..."
-    done
-
-    echo " >> Karaf is UP! Installing features..."
-    # สั่งติดตั้ง Feature
-    $CLIENT_BIN "feature:install odl-restconf odl-openflowplugin-flow-services-rest odl-openflowplugin-app-table-miss-enforcer"
-    
-    echo " >> Feature installation command sent."
+# ฟังก์ชันสำหรับ Print ลงทั้งหน้าจอและ Log file
+log_msg() {
+    echo "$1" | tee -a $LOG_FILE
 }
 
-# สั่งให้ฟังก์ชันนี้ทำงานใน Background (&) โดยไม่บล็อก Process หลัก
-install_features_task &
+log_msg "--- [Setup] Script Started ---"
 
-echo "--- [Setup] Configuration Prepared (Background tasks started) ---"
+# 1. รอ Karaf (วนลูปเช็ค)
+log_msg " >> Waiting for Karaf SSH..."
+
+RETRIES=0
+MAX_RETRIES=60
+
+while true; do
+    # เช็คสถานะ (ซ่อน error ไว้ก่อนจะได้ไม่รก)
+    $CLIENT_BIN "system:version" > /dev/null 2>&1
+    
+    if [ $? -eq 0 ]; then
+        log_msg " >> Karaf is UP! Ready to install."
+        break
+    fi
+
+    if [ $RETRIES -ge $MAX_RETRIES ]; then
+        log_msg " !! FAIL: Karaf took too long."
+        exit 1
+    fi
+
+    echo -n "." # พิมพ์จุดรอไปเรื่อยๆ
+    sleep 10
+    RETRIES=$((RETRIES+1))
+done
+
+echo "" # ขึ้นบรรทัดใหม่หลังจุด
+
+# 2. ติดตั้ง Feature
+log_msg " >> Installing features: $FEATURES"
+# สั่งติดตั้งและโชว์ผลลัพธ์ถ้ามี error
+$CLIENT_BIN "feature:install $FEATURES" | tee -a $LOG_FILE
+
+# 3. ตรวจสอบและโชว์ผลลัพธ์ (ส่วนที่คุณต้องการ!)
+log_msg "========================================"
+log_msg " >> VERIFICATION RESULT (feature:list):"
+log_msg "========================================"
+
+# --- ไฮไลท์: สั่ง print ออกมาตรงๆ เลย ---
+$CLIENT_BIN "feature:list -i | grep openflow" | tee -a $LOG_FILE
+
+log_msg "========================================"
+log_msg "--- [Setup] Finished ---"

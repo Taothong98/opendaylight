@@ -23,10 +23,11 @@ nohup jupyter lab --allow-root > /var/log/jupyter.log 2>&1 &
 
 # 3. Start OpenDaylight (Main Process)
 # echo "=== [Boot] Starting OpenDaylight ==="
+
 # ไฟล์นี้จะแก้ Config และรอ Install feature แบบ Background
-if [ -f "/usr/local/bin/setup_odl.sh" ]; then
-    /usr/local/bin/setup_odl.sh
-fi
+# if [ -f "/usr/local/bin/setup_odl.sh" ]; then
+#     /usr/local/bin/setup_odl.sh
+# fi
 
 # 5. Start OpenDaylight (พระเอกตัวจริง)
 echo "=== [Boot] Starting OpenDaylight Main Process ==="
