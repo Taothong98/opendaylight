@@ -1,11 +1,9 @@
+
 services:
   opendaylight:
     build:
       context: ./
       dockerfile: dockerfile.odl
-    # image: opendaylight/odl:latest
-    # image: opendaylight/odl-ubuntu-image
-    # image: taothong/odl-ubuntu-f:1.0
     container_name: odl_controller
     ports:
       - "8181:8181"
@@ -35,10 +33,6 @@ services:
       # - /usr/local/bin/setup_odl.sh
       # - /usr/local/bin/unlock_hawtio.sh
 
-
-
-
-
     #   - ./entrypoint.sh:/entrypoint.sh    
     #   - ./users.properties:/etc/users.properties
     privileged: true  # <--- บรรทัดนี้สำคัญที่สุด! สำคัญกว่า cap_add
@@ -51,9 +45,7 @@ services:
     restart: unless-stopped
     stdin_open: true
     tty: true
-    networks:      
-      wan:
-        ipv4_address: 192.168.100.200  
+ 
 
 
     # ONOS Controller
@@ -70,15 +62,53 @@ services:
     ports:
       - "8080:8080"      
     # network_mode: "host"        
-    # depends_on:
-    #   - odl-service
-    networks:      
-      wan:
-        ipv4_address: 192.168.100.100    
 
-networks:
-  wan:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.100.0/24
+
+
+  open-webui:
+      container_name: open-webui
+      image: ghcr.io/open-webui/open-webui:main
+      ports:
+          - 8099:8080
+      volumes:
+          - open-webui:/app/backend/data  # ใช้สำหรับเก็บข้อมูลของ Open Web UI
+      environment:
+      - OPENAI_API_BASE_URL=http://pipelines:9099      
+      - OPENAI_API_KEY=0p3n-w3bu!      
+      
+      #     - OLLAMA_BASE_URL=http://ollama:11434        
+      #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+
+  pipelines:
+      ports:
+          - 9999:9099
+      extra_hosts:
+          - host.docker.internal:host-gateway
+      volumes:
+          - pipelines:/app/pipelines
+      container_name: pipelines
+      restart: always
+      image: ghcr.io/open-webui/pipelines:main
+
+  # ollama:
+  #     volumes:
+  #         - ollama:/root/.ollama
+  #     ports:
+  #         - 11434:11434
+  #     container_name: ollama
+  #     image: ollama/ollama  
+
+# docker volume create --name=pipelines
+# docker volume create --name=ollama
+# docker volume create --name=open-webui
+volumes:
+    open-webui:
+        external: true
+        name: open-webui
+    ollama:
+        external: true
+        name: ollama
+    pipelines:
+        external: true
+        name: pipelines   
